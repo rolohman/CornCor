@@ -10,9 +10,12 @@ params.kernel = 'Gaussian';
 params.OPTIONS = optimoptions('lsqnonlin','MaxIterations',50,'Display','none');
 
 
-params.bigbase = abpr'>50;
-params.bpw     = 200; %weights for baseline estimation
 
-params.dely = 2;
+params.bpw     = 200; %weights for baseline dependenceestimation
+params.minbase = 50; %only use baselines > this amount
+
+params.dely    = 2;
+params.k       = [1 2];
+
 
    
