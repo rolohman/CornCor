@@ -1,4 +1,4 @@
-function fids=open_files(params)
+function fids=open_files(params,dates,nd)
 
 adir           = [params.outdir 'models'];
 fids.bpslope   = fopen([adir 'corbpslope.r4'],'w');

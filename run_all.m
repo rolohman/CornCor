@@ -1,11 +1,13 @@
 define_params
+nx=params.nx;
+ny=params.ny;
 
 init_dir(params)
 
 [dates,slcnames]                  = list_slcs(params);
-[dn,nd,intid,dt,ni,id1,id2,diags] = make_pairs(dates);
+[dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates);
 [Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
-fids                              = open_files;
+fids                              = open_files(params,dates,nd);
 
 
 load baselines.txt
@@ -15,17 +17,17 @@ bigbase = abpr'>params.minbase;
 
 [windx,windy,wind,windn,wind3,windn3] = make_kernel(params);
 
-for j=1:dely:ny
+for j=1:params.dely:ny
     j
    
-    cpx = load_slc_chunk(params,slcnames,1,nx,j-ry,j+ry+dely,'cpx');
+    cpx = load_slc_chunk(params,slcnames,1,nx,j-params.ry,j+params.ry+params.dely,'cpx');
     disp('done loading')
 
-    [gamma,ints,cors,hp]=make_cor(cpx,ni,nx,dely,wind,windn3,windn);
+    [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params);
     disp('done making cor')
     
   
-    for k=1:dely      
+    for k=1:params.dely      
         for i=1:nx
             
             
@@ -42,17 +44,18 @@ for j=1:dely:ny
             
             [c00,cp0,cr0] = invert_cormat(d',nd,Gi0);
             cr0(cr0>0)    = 0;
+            synth         = c00+Gi0*cp0'-abs(Gr0*cr0');
             
-            mk1_init=sqrt(1./exp(cr0).^2-1);
-            mk2_init=2*sqrt(1./exp(cr0)-1);
+            mk1_init = sqrt(1./exp(cr0).^2-1);
+            mk2_init = 2*sqrt(1./exp(cr0)-1);
             
-            
+            return
             start   = [c00;cp0';mk1_init(2:end)'];
             LB      = [-inf(nd,1);zeros(nd-1,1)];
             UB      = [zeros(nd,1);inf(nd-1,1)];
-            modk1 = lsqnonlin('corfit',start,LB,UB,OPTIONS,logcor(:,smallx(i),k),Gr0,Gi0,nd,1);
+            modk1   = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d',Gr0,Gi0,nd,1);
             start   = [c00;cp0';mk2_init(2:end)'];
-            modk2 = lsqnonlin('corfit',start,LB,UB,OPTIONS,logcor(:,smallx(i),k),Gr0,Gi0,nd,2);
+            modk2   = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d',Gr0,Gi0,nd,2);
             allc00(i,k)=c00;
             allc0(i,k)=modk1(1);
             allcp(i,:,k)=modk1(2:nd);
@@ -140,12 +143,13 @@ if(n>2)
   R(i,k)=1-(sum((angle(ph)-a1).^2)/sum((angle(resk1)-a2).^2));
 Rb(i,k)=(1-(1-R(i,k))*(n-1)/(n-2));
 else
-
+end
     end  
-
+        end
     write_output(fids,stuff)
     
-end
+        end
+
 
 
 fclose('all');

@@ -1,4 +1,9 @@
-function [gamma,ints,cors,hp]=make_cor(cpx,ni,nx,dely,wind,windn3,windn)
+function [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params)
+
+ni     = size(intid,1);
+nx     = params.nx;
+dely   = params.dely;
+ry     = params.ry;
 
 gamma  = nan(ni,nx,dely);
 ints   = nan(ni,nx,dely);

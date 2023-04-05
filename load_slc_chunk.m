@@ -1,4 +1,4 @@
-function data= load_chunk(params,slcnames,x1,x2,y1,y2,type)
+function data= load_chunk(params,filenames,x1,x2,y1,y2,type)
 
 nx=params.nx;
 ny=params.ny;

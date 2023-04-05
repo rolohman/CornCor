@@ -22,7 +22,7 @@ switch kernel
         windy        = [windy fliplr(windy(1:end01))];
 
     otherwise
-        disp('kernel type must be Gaussian, Uniform or Triangle'
+        disp('kernel type must be Gaussian, Uniform or Triangle')
         return
 end
         
