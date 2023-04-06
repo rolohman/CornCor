@@ -26,6 +26,7 @@ for j=1:params.dely:ny
     [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params);
     disp('done making cor')
     
+    %add scaling/saving 2d histogram
   
     for k=1:params.dely      
         for i=1:nx
