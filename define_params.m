@@ -15,7 +15,7 @@ params.bpw     = 200; %weights for baseline dependence estimation
 params.minbase = 50; %only use baselines > this amount
 
 params.dely    = 10;
-params.k       = [1 2];
+params.k       = [1];
 
 
    

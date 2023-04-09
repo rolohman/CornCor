@@ -21,8 +21,8 @@ for i=1:ni
     cpx3 = csum./asum./bsum;
     cpx3(isnan(cpx3)) = 0;
     
-    gamma(i,:,:) = cpx3(:,ry+[1:dely]);
-    ints(i,:,:)  = c(:,ry+[1:dely]);
+    gamma(i,:,:) = cpx3(:,ry*2+[1:dely]);
+    ints(i,:,:)  = c(:,ry*2+[1:dely]);
 end
 cors          = abs(gamma);
 good          = cors>0;
