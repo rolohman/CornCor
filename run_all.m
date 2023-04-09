@@ -62,7 +62,7 @@ for j=1:params.dely:ny
             allc0(i)   = modk1(1);
             allcp(i,:) = cp0;
             allmk1(i,:)=mk1;
-            
+            allcr(i,:)=cr0;
             meank1      = atan(mk1);
             
             %now do hp fit
@@ -107,8 +107,8 @@ for j=1:params.dely:ny
           
           
         end
-    
-        write_output(fids,allbps,mcor_orig,mcor_res,allc0,cr0,allmk1,cp0,slopesk1,tphs_orig,tphs_res,allhp);
+    return
+        write_output(fids,allbps,mcor_orig,mcor_res,allc0,allcr,allmk1,allcp,slopesk1,tphs_orig,tphs_res,allhp);
     end
 end
 
