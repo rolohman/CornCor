@@ -4,6 +4,12 @@ dn           = [dates.dn]';
 nd           = length(dates);
 intid        = nchoosek(1:nd,2);
 dt           = diff(intid,[],2);
+
+
+use=or(dt<=5,intid(:,1)<=2);
+intid=intid(use,:);
+dt=dt(use);
+
 ni           = length(intid);
 id1          = intid(:,1);
 id2          = intid(:,2);

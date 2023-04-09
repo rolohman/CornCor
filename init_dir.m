@@ -17,6 +17,9 @@ if(~exist(outdir,'dir'))
     if(~exist([adir 'perm'],'dir'))
         mkdir([adir 'perm']);
     end
+    if(~exist([adir 'hp'],'dir'))
+	    mkdir([adir 'hp']);
+    end
     save([outdir '/paramfile.mat'],'params');
 else
     disp([outdir ' already exists, is that okay?'])    
