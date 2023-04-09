@@ -51,7 +51,7 @@ for j=1:params.dely:ny
             mk1_init = sqrt(1./exp(cr0).^2-1);
             mk2_init = 2*sqrt(1./exp(cr0)-1);
             
-         d=d-Gi0*cp0'; 
+            d=d-[Gi0*cp0']';
             start   = [c00;mk1_init(2:end)'];
             LB      = [-inf(1);zeros(nd-1,1)];
             UB      = [zeros(1,1);inf(nd-1,1)];
