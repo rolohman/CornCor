@@ -107,7 +107,6 @@ for j=1:params.dely:ny
           
           
         end
-    return
         write_output(fids,allbps,mcor_orig,mcor_res,allc0,allcr,allmk1,allcp,slopesk1,tphs_orig,tphs_res,allhp);
     end
 end
