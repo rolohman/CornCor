@@ -1,4 +1,4 @@
-params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
+params.slcdir='cropped_41000_11942_375_200/SLC_VH/';
 params.outdir=[params.slcdir 'trial1/'];
 
 params.nx     = 375;

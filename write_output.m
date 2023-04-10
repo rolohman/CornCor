@@ -1,5 +1,5 @@
 function write_output(fids,allbps,mcor_orig,mcor_res,allc0,allcr,allmk1,allcp,slopesk1,tphs_orig,tphs_res,allhp)
-nd=63;
+nd=length(fids.rel);
     fwrite(fids.c0,exp(allc0),'real*4');
     fwrite(fids.bpslope,allbps,'real*4');
     
