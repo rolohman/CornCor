@@ -7,7 +7,7 @@ init_dir(params)
 [dates,slcnames]                  = list_slcs(params);
 [dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates);
 [Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
-fids                              = open_files(params,dates,nd);
+fids                              = open_files(params,dates,nd,'w');
 
 
 load baselines.txt

@@ -1,9 +1,15 @@
 function [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params)
 
+
 ni     = size(intid,1);
 nx     = params.nx;
 dely   = params.dely;
 ry     = params.ry;
+
+if(params.dely==0)%just plotting point
+    [nx,dely]=size(wind);
+end
+    
 
 gamma  = nan(ni,nx,dely);
 ints   = nan(ni,nx,dely);
@@ -21,8 +27,13 @@ for i=1:ni
     cpx3 = csum./asum./bsum;
     cpx3(isnan(cpx3)) = 0;
     
-    gamma(i,:,:) = cpx3(:,ry*2+[1:dely]);
-    ints(i,:,:)  = c(:,ry*2+[1:dely]);
+    if(params.dely==0)
+        gamma(i,:,:)=cpx3;
+        ints(i,:,:)=c;
+    else
+        gamma(i,:,:) = cpx3(:,ry*2+[1:dely]);
+        ints(i,:,:)  = c(:,ry*2+[1:dely]);
+    end
 end
 cors          = abs(gamma);
 good          = cors>0;
