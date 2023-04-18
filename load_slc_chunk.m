@@ -28,7 +28,7 @@ if(x2>nx)
     x2=nx;
     x0b=zeros(nxend,newdy);
 end   
-    
+
 n=length(filenames);
 switch type
     case 'cpx' %cpx
@@ -40,7 +40,7 @@ switch type
             fclose(fid);
             tmp=tmp(1:2:end,:)+1j*tmp(2:2:end,:);           
             tmp=tmp(x1:x2,:);
-            data(i,:,:)=[x0a;y0a tmp y0b;x0b];
+            data(i,:,1:(size(tmp,2)+size(y0a,2)+size(y0b,2)))=[x0a;y0a tmp y0b;x0b];
         end
     case 'rmg' %rmg
         data=zeros(n,newdx,newdy*2);
@@ -50,7 +50,7 @@ switch type
             tmp=fread(fid,[nx,(y2-y1)+1],'real*4');
             fclose(fid);
             tmp=tmp(x1:x2,:);
-            data(i,:,:)=tmp;
+            data(i,:,1:size(tmp,2))=tmp;
         end
     case 'r4' %r4
         data=zeros(n,newdx,newdy);
@@ -60,7 +60,7 @@ switch type
             tmp=fread(fid,[nx,(y2-y1)+1],'real*4');
             fclose(fid);
             tmp=tmp(x1:x2,:);
-            data(i,:,:)=tmp;
+            data(i,:,1:size(tmp,2))=tmp;
         end
 end
 

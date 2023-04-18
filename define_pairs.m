@@ -6,7 +6,7 @@ intid        = nchoosek(1:nd,2);
 dt           = diff(intid,[],2);
 
 
-use=or(dt<=50,intid(:,1)<=50);
+use=or(dt<=15,intid(:,1)<=5);
 intid=intid(use,:);
 dt=dt(use);
 

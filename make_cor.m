@@ -7,7 +7,8 @@ dely   = params.dely;
 ry     = params.ry;
 
 if(params.dely==0)%just plotting point
-    [nx,dely]=size(wind);
+    nx=size(cpx,2);
+    dely=size(cpx,3);
 end
     
 

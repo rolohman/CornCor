@@ -31,7 +31,7 @@ windy         = windy/sum(windy);
 wind          = windy'*windx;
 
 
-windn         = conv2(ones(nx,dely+length(windx)),wind,'same');
+windn         = conv2(ones(nx,dely+length(windy)),wind,'same');
 
 windn3(1,:,:) = windn;
 wind3(1,:,:)  = wind;

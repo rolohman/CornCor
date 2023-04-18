@@ -1,6 +1,6 @@
 %function output=plot_pt(xpt,ypt,plotflag)
 xpt=101
-ypt=101
+ypt=20
 define_params
 oldparams=params;
 nx=params.nx;
@@ -9,11 +9,12 @@ rx=params.rx;
 ry=params.ry;
 params.dely=0;
 init_dir(params)
-adir           = [params.outdir 'models/'];
+
 [dates,slcnames]                  = list_slcs(params);
 [dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates);
 [Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
-fids                              = open_files(params,dates,nd,'r');
+filenames                         = make_filenames(params,dates,nd);
+fids                              = open_files(filenames,'r');
 
 
 load baselines.txt
@@ -22,11 +23,20 @@ abpr    = abs(bpr);
 bigbase = abpr'>params.minbase;
 
 [windx,windy,wind,~,wind3] = make_kernel(params);
-windn                      = conv2(ones(size(wind)),wind,'same');
-windn3(1,:,:)              = windn;
 
+x1 = max(1,xpt-floor(length(windx)/2));
+x2 = min(nx,xpt+floor(length(windx)/2));
+y1 = max(1,ypt-floor(length(windy)/2));
+y2 = min(ny,ypt+floor(length(windy)/2));
+x0 = xpt-x1+1;
+y0 = ypt-y1+1;
+dx = x2-x1+1;
+dy = y2-y1+1;
+cpx    = load_slc_chunk(params,slcnames,x1,x2,y1,y2,'cpx');
 
-cpx    = load_slc_chunk(params,slcnames,xpt-floor(length(windx)/2),xpt+floor(length(windx)/2),ypt-floor(length(windy)/2),ypt+floor(length(windy)/2),'cpx');
+windn         = conv2(ones(size(cpx,2),size(cpx,3)),wind,'same');
+windn3(1,:,:) = windn;
+
 amps   = cpx.*conj(cpx);
 ampsum = sqrt(convn(amps,wind3,'same')./windn3);
 
@@ -35,58 +45,66 @@ disp('done loading')
 [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params);
 disp('done making cor')
 
-cors   = squeeze(cors(:,rx*2+1,ry*2+1));
-hp     = squeeze(hp(:,rx*2+1,ry*2+1));
-gamma  = squeeze(gamma(:,rx*2+1,ry*2+1));
+cors   = squeeze(cors(:,x0,y0));
+hp     = squeeze(hp(:,x0,y0));
+gamma  = squeeze(gamma(:,x0,y0));
 
 
 triplets0       = trip_nm(gamma./cors,intid,1);
-slopes          = squeeze(load_slc_chunk(params,{[adir 'slopesk' num2str(params.k(1)) '.r4']},xpt-floor(length(windx)/2),xpt+floor(length(windx)/2),ypt-floor(length(windy)/2),ypt+floor(length(windy)/2),'r4'));
-correction      = ones(nd,rx*4+1,ry*4+1);
+slopes          = squeeze(load_slc_chunk(params,{filenames.slope{1}},x1,x2,y1,y2,'r4'));
+correction      = ones(nd,dx,dy);
 for i=1:nd
-    mk                = load_slc_chunk(params,{[adir 'mk/' dates(i).name '.mk' num2str(params.k(1))]},xpt-floor(length(windx)/2),xpt+floor(length(windx)/2),ypt-floor(length(windy)/2),ypt+floor(length(windy)/2),'r4');
+    mk                = load_slc_chunk(params,{filenames.mk{i,1}},x1,x2,y1,y2,'r4');
     mk(mk>10)         = 10;
     mk(isnan(mk))     = 0;
     mk                = squeeze(mk);
     means             = atan(mk);
-    correction(i,:,:) = exp(1j*mk.*slopes).*conj(exp(1j*means));
-    allmk(i)          = mk(rx*2+1,ry*2+1);
+    %correction(i,:,:) = exp(1j*mk.*slopes).*conj(exp(1j*means));
+   correction(i,:,:) = exp(1j*mk.*slopes);
+    allmk(i)          = mk(x0,y0);
 end
 
-
-mags          = squeeze(ampsum(:,rx*2+1,ry*2+1));
+for i=1:nd
+     hp0(i)                = load_slc_chunk(params,{filenames.hp{i}},xpt,xpt,ypt,ypt,'r4');
+end
+    
+mags          = squeeze(ampsum(:,x0,y0));
 diffmag       = mags(intid(:,2))-mags(intid(:,1));
 diffmk        = allmk(intid(:,2))-allmk(intid(:,1));
 
-slopes        = slopes(rx*2+1,ry*2+1);
+slopes        = slopes(x0,y0);
 
 figure
 subplot(3,4,1)
 triplot(angle(hp),dn,intid)
 c1=caxis;
 title('hp')
+
 subplot(3,4,2)
 triplot(cors,dn,intid)
 c2=caxis;
 title('cor')
+
 subplot(3,4,3)
 triplot(angle(triplets0),dn,intid)
 c3=caxis;
 title('phase closure')
+
 subplot(3,4,4)
 scatter(abs(diffmk(1,:))',[angle(hp.*exp(1j*atan(diffmk(1,:))'))].*sign(diffmk(1,:))',18,abs(diffmag),'filled')
 hold on
-plot(allmk,allmk.*slopes,'r.')
+plot(allmk,hp0+atan(allmk),'ko','markerfacecolor','k')
+plot(allmk,allmk.*slopes+atan(allmk),'r.')
 xlabel('m')
 ylabel('hp phase')
 grid on
-axis([0 2 -pi pi])
+axis([0 2.5 -pi pi])
 
 
-[newgamma,newints,newcors,newhp]=make_cor(cpx.*(correction),intid,wind,windn,wind3,windn3,params);
-newcors   = squeeze(newcors(:,rx*2+1,ry*2+1));
-newhp     = squeeze(newhp(:,rx*2+1,ry*2+1));
-newgamma  = squeeze(newgamma(:,rx*2+1,ry*2+1));
+[newgamma,newints,newcors,newhp]=make_cor(cpx.*conj(correction),intid,wind,windn,wind3,windn3,params);
+newcors   = squeeze(newcors(:,x0,y0));
+newhp     = squeeze(newhp(:,x0,y0));
+newgamma  = squeeze(newgamma(:,x0,y0));
 
 triplets1 = trip_nm(newgamma./newcors,intid,1);
 
@@ -105,6 +123,6 @@ caxis(c3)
 subplot(3,4,8)
 plot(abs(diffmk'),angle(newhp).*sign(diffmk'),'.')
 grid on
-axis([0 2 -pi pi])
+axis([0 2.5 -pi pi])
 xlabel('m')
 ylabel('hp phase')
