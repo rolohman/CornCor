@@ -1,4 +1,4 @@
-function res=corfit(model,cors,Gr0,Gi0,nd,k)
+function [res,synth]=corfit(model,cors,Gr0,Gi0,nd,k)
 %expects logc0/cp cors;
 c0=model(1);
 %cp=model(2:nd);

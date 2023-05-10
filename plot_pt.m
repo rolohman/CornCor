@@ -1,20 +1,32 @@
 %function output=plot_pt(xpt,ypt,plotflag)
-xpt=101
-ypt=20
+clear windn3 
+%xpt=252;
+%ypt=106;
+%xpt=361;
+%ypt=133;
+%xpt=165;
+%ypt=80;
+%xpt=182;ypt=54;
+
 define_params
-oldparams=params;
+params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
+params.outdir=[params.slcdir 'trial1/'];
+
 nx=params.nx;
 ny=params.ny;
 rx=params.rx;
 ry=params.ry;
-params.dely=0;
+
 init_dir(params)
 
 [dates,slcnames]                  = list_slcs(params);
-[dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates);
+params.dely = 0;
+params.dt1  = length(dates);
+
+[dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates,params.maxdt,params.dt1);
 [Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
 filenames                         = make_filenames(params,dates,nd);
-fids                              = open_files(filenames,'r');
+%fids                              = open_files(filenames,'r');
 
 
 load baselines.txt
@@ -72,7 +84,7 @@ mags          = squeeze(ampsum(:,x0,y0));
 diffmag       = mags(intid(:,2))-mags(intid(:,1));
 diffmk        = allmk(intid(:,2))-allmk(intid(:,1));
 
-slopes        = slopes(x0,y0);
+slopes        = slopes(x0,y0)
 
 figure
 subplot(3,4,1)
@@ -94,10 +106,11 @@ subplot(3,4,4)
 scatter(abs(diffmk(1,:))',[angle(hp.*exp(1j*atan(diffmk(1,:))'))].*sign(diffmk(1,:))',18,abs(diffmag),'filled')
 hold on
 plot(allmk,hp0+atan(allmk),'ko','markerfacecolor','k')
-plot(allmk,allmk.*slopes+atan(allmk),'r.')
+plot(allmk,angle(exp(1j*allmk.*slopes)),'r.')
 xlabel('m')
 ylabel('hp phase')
 grid on
+plot([0.4 0.4],[-pi pi],'k:')
 axis([0 2.5 -pi pi])
 
 

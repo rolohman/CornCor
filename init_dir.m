@@ -11,8 +11,8 @@ if(~exist(outdir,'dir'))
     if(~exist([adir 'mk'],'dir'))
         mkdir([adir 'mk']);
     end
-    if(~exist([adir 'rel'],'dir'))
-        mkdir([adir 'rel']);
+    if(~exist([adir 'lp'],'dir'))
+        mkdir([adir 'lp']);
     end
     if(~exist([adir 'perm'],'dir'))
         mkdir([adir 'perm']);

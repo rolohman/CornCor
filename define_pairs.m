@@ -1,4 +1,4 @@
-function [dn,nd,intid,dt,ni,id1,id2,diags]=make_pairs(dates)
+function [dn,nd,intid,dt,ni,id1,id2,diags]=make_pairs(dates,maxdt,dt1)
 
 dn           = [dates.dn]';
 nd           = length(dates);
@@ -6,9 +6,9 @@ intid        = nchoosek(1:nd,2);
 dt           = diff(intid,[],2);
 
 
-use=or(dt<=15,intid(:,1)<=5);
-intid=intid(use,:);
-dt=dt(use);
+use    = or(dt<=maxdt,intid(:,1)<=dt1);
+intid  = intid(use,:);
+dt     = dt(use);
 
 ni           = length(intid);
 id1          = intid(:,1);
