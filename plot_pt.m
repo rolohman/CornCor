@@ -1,5 +1,6 @@
 %function output=plot_pt(xpt,ypt,plotflag)
 clear windn3 
+disp('hi')
 %xpt=252;
 %ypt=106;
 %xpt=361;
