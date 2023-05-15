@@ -1,8 +1,8 @@
 function [res,synth]=corfit(model,cors,Gr0,Gi0,nd,k)
 %expects logc0/cp cors;
 c0=model(1);
-%cp=model(2:nd);
-m=[0;model(2:end)];
+cp=model(2:nd);
+m=[0;model(nd+1:end)];
 
 mdiff=Gr0*m;
 if(k==1)
@@ -12,8 +12,8 @@ else
 end
 gamma(isinf(gamma))=0;
 gamma=log(gamma);
-%cpp=Gi0*cp;
-synth=c0+gamma;
+cpp=Gi0*cp;
+synth=c0+gamma+cpp;
 res=cors-synth;
 
 

@@ -1,6 +1,6 @@
 %function output=plot_pt(xpt,ypt,plotflag)
 clear windn3 
-disp('hi')
+
 %xpt=252;
 %ypt=106;
 %xpt=361;
@@ -11,7 +11,7 @@ disp('hi')
 
 define_params
 params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
-params.outdir=[params.slcdir 'trial3/'];
+params.outdir=[params.slcdir 'trial2/'];
 
 nx=params.nx;
 ny=params.ny;
@@ -71,7 +71,7 @@ for i=1:nd
     mk(mk>10)         = 10;
     mk(isnan(mk))     = 0;
     mk                = squeeze(mk);
-    means             = -atan(mk);
+    means             = atan(mk);
     %correction(i,:,:) = exp(1j*mk.*slopes).*conj(exp(1j*means));
    correction(i,:,:) = exp(1j*mk.*slopes);
     allmk(i)          = mk(x0,y0);

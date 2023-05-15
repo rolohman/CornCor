@@ -3,8 +3,8 @@ clear windn3
 %xpt=101
 %ypt=105
 define_params
-params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
-params.outdir=[params.slcdir 'trial1/'];
+%params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
+%params.outdir=[params.slcdir 'trial1/'];
 
 nx=params.nx;
 ny=params.ny;
@@ -50,7 +50,7 @@ mk=squeeze(mk);
 
 %[i,j]=find(tphs_res>0.95 & 
 
-
+return
 
 params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
 params.outdir=[params.slcdir 'trial2/'];

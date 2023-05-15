@@ -1,5 +1,5 @@
 params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
-params.outdir=[params.slcdir 'trial3/'];
+params.outdir=[params.slcdir 'trial4/'];
 
 params.nx     = 375;
 params.ny     = 200;
@@ -16,7 +16,7 @@ params.minbase = 50; %only use baselines > this amount
 
 params.dely    = 10; %number of lines to process in each batch
 params.k       = [1];
-params.maxdt   = 10; %maximum time interval to use in calcs
+params.maxdt   = 10000; %maximum time interval to use in calcs
 params.dt1     = 3;  %always make pairs starting with dates <= this date
 
 

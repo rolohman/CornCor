@@ -57,14 +57,14 @@ for j=1:params.dely:ny
             [c00,cp0,mk0] = invert_m_mat(d',nd,Gi0,intid);
             
             d       = d-[Gi0*cp0']';
-            start   = [c00;mk0(2:end)];
-            LB      = [-inf(1);zeros(nd-1,1)];
-            UB      = [zeros(1,1);inf(nd-1,1)];
+            start   = [c00;cp0';mk0(2:end)];
+            LB      = [-inf(nd,1);zeros(nd-1,1)];
+            UB      = [zeros(nd,1);inf(nd-1,1)];
             modk1   = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d',Gr0,Gi0,nd,1);
             res      = corfit(modk1,d',Gr0,Gi0,nd,1);
             mcor_res(i)=sqrt(mean(res.^2,'omitnan'));
             
-            mk1     = [0;modk1(2:end)];
+            mk1     = [0;modk1(nd+1:end)];
             allc0(i)   = modk1(1);
             allcp(i,:) = cp0;
             allmk1(i,:) = mk1;
