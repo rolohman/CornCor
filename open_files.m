@@ -3,7 +3,6 @@ function fids=open_files(filenames,rw)
 nd=length(filenames.hp);
 ks=length(filenames.slope);
 
-fids.bpslope   = fopen(filenames.bpslope,rw);
 fids.c0        = fopen(filenames.c0,rw);
 fids.mcor_orig = fopen(filenames.mcor_orig,rw);
 fids.mcor_res  = fopen(filenames.mcor_res,rw);

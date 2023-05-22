@@ -1,18 +1,9 @@
-%function output=plot_pt(xpt,ypt,plotflag)
+function output=plot_pt_correct(xpt,ypt,plotflag)
 clear windn3 
 
-%xpt=252;
-%ypt=106;
-%xpt=361;
-%ypt=133;
-%xpt=165;
-%ypt=80;
-%xpt=182;ypt=54;
+
 
 define_params
-%params.slcdir='cropped_15420_1396_1600_320/SLC_vv/';
-%params.outdir=[params.slcdir 'trial1/'];
-
 nx=params.nx;
 ny=params.ny;
 rx=params.rx;
@@ -24,16 +15,14 @@ init_dir(params)
 params.dely = 0;
 params.dt1  = length(dates);
 
-[dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates,params.maxdt,params.dt1);
-[Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
+[dn,nd,intid,dt,ni,id1,id2,~]     = define_pairs(dates,params.maxdt,params.dt1);
+[Gi0,~]                           = make_G(ni,nd,id1,id2);
 filenames                         = make_filenames(params,dates,nd);
-%fids                              = open_files(filenames,'r');
 
-
-load baselines.txt
-bpr     = baselines(id1)-baselines(id2);
-abpr    = abs(bpr);
-bigbase = abpr'>params.minbase;
+% load baselines.txt
+% bpr     = baselines(id1)-baselines(id2);
+% abpr    = abs(bpr);
+% bigbase = abpr'>params.minbase;
 
 [windx,windy,wind,~,wind3] = make_kernel(params);
 
@@ -45,6 +34,7 @@ x0 = xpt-x1+1;
 y0 = ypt-y1+1;
 dx = x2-x1+1;
 dy = y2-y1+1;
+
 cpx    = load_slc_chunk(params,slcnames,x1,x2,y1,y2,'cpx');
 
 windn         = conv2(ones(size(cpx,2),size(cpx,3)),wind,'same');

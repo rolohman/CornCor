@@ -9,11 +9,14 @@ ry     = params.ry;
 if(params.dely==0)%just plotting point
     nx=size(cpx,2);
     dely=size(cpx,3);
+    gamma  = nan(ni,nx,dely);
+    ints   = nan(ni,nx,dely);
+else
+    gamma  = nan(ni,nx,dely+ry*4+1);
+    ints   = nan(ni,nx,dely+ry*4+1);
 end
-    
 
-gamma  = nan(ni,nx,dely);
-ints   = nan(ni,nx,dely);
+
 amps   = cpx.*conj(cpx);
 ampsum = sqrt(convn(amps,wind3,'same')./windn3);
 
@@ -28,13 +31,8 @@ for i=1:ni
     cpx3 = csum./asum./bsum;
     cpx3(isnan(cpx3)) = 0;
     
-    if(params.dely==0)
-        gamma(i,:,:)=cpx3;
-        ints(i,:,:)=c;
-    else
-        gamma(i,:,:) = cpx3(:,ry*2+[1:dely]);
-        ints(i,:,:)  = c(:,ry*2+[1:dely]);
-    end
+    gamma(i,:,:)=cpx3;
+    ints(i,:,:)=c;
 end
 cors          = abs(gamma);
 good          = cors>0;

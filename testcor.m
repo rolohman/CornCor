@@ -1,27 +1,39 @@
-define_params
-nx=params.nx;
-ny=params.ny;
+load teststuff
 
-init_dir(params)
-[dates,slcnames]                  = list_slcs(params);
-[dn,nd,intid,dt,ni,id1,id2,diags] = define_pairs(dates,params.maxdt,params.dt1);
-[Gi0,Gr0]                         = make_G(ni,nd,id1,id2);
-
-
-data  = abs(gamma);
+data  = cors;
 d     = log(data)';
-
-
-mcor_orig=sqrt(mean(d.^2,'omitnan'));
+define_params
+d(d>0)=0;
+stds=sqrt(-2*d);
 
 [c00,cp0,mk0,synth0] = invert_m_mat(d',nd,Gi0,intid);
+mk0(isnan(mk0))=0;
 
-d       = d-[Gi0*cp0']';
-start   = [c00;cp0';mk0(2:end)];
-LB      = [-inf(nd,1);zeros(nd-1,1)];
-UB      = [zeros(nd,1);inf(nd-1,1)];
-modk1   = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d',Gr0,Gi0,nd,1);
-[res,synth]      = corfit(modk1,d',Gr0,Gi0,nd,1);
-mcor_res=sqrt(mean(res.^2,'omitnan'));
+d2       = d'-c00-Gi0*cp0;
+d2(isnan(synth0))=NaN;
 
+good=isfinite(d2);
+start   = [mk0];
+LB      = [zeros(nd,1)];
+UB      = [inf(nd,1)];
+modk1   = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d2(good),stds(good)',Gr0(good,:),1);
+[res,synth]      = corfit(modk1,d2(good),stds(good)',Gr0(good,:),1);
+synth=synth+c00+Gi0(good,:)*cp0;
 
+c=[-3 0];
+figure
+subplot(2,2,1)
+triplot(d(good),dn,intid(good,:)),caxis(c)
+subplot(2,2,2)
+triplot(synth0,dn,intid),caxis(c)
+subplot(2,2,3)
+triplot(synth,dn,intid(good,:)),caxis(c)
+
+figure
+subplot(1,2,1)
+plot(mk0)
+hold on
+plot(modk1)
+
+subplot(1,2,2)
+plot(cp0)

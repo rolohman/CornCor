@@ -11,10 +11,15 @@ for i=1:ni
     else
         shortid1        = intid(i,1):n:intid(i,2)-n;
         shortid2        = shortid1+n;
-        shortid1(end+1) = shortid2(end);
-        shortid2(end+1) = intid(i,2);
+        %shortid1(end+1) = shortid2(end);
+        %shortid2(end+1) = intid(i,2);
         
-        shortids        = unique(find(ismember(intid,[shortid1' shortid2'],'rows')));
+        %shortids        = unique(find(ismember(intid,[shortid1' shortid2'],'rows')));
+        shorts=[shortid1' shortid2'];
+        
+        shortids=ismember(intid,shorts,'rows');
+      
+        
         triplets(i,:,:) = prod(allintf(shortids,:,:),1).*conj(allintf(i,:,:));
     end
 end

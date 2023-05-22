@@ -1,7 +1,6 @@
 function filenames=make_filenames(params,dates,nd)
 
 adir           = [params.outdir 'models/'];
-filenames.bpslope   = [adir 'corbpslope.r4'];
 filenames.c0        = [adir 'c0.r4'];
 filenames.mcor_orig = [adir 'mcor_orig.r4'];
 filenames.mcor_res  = [adir 'mcor_res.r4'];

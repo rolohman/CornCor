@@ -1,8 +1,7 @@
-function write_output(fids,allbps,mcor_orig,mcor_res,allc0,allmk1,allcp,slopesk1,tphs_orig,tphs_res,tphs_resk,allhp,alllp)
+function write_output(fids,mcor_orig,mcor_res,allc0,allmk1,allcp,slopesk1,tphs_orig,tphs_res,tphs_resk,allhp,alllp)
 nd=length(fids.hp);
 ks=length(fids.slope);
 fwrite(fids.c0,exp(allc0),'real*4');
-fwrite(fids.bpslope,allbps,'real*4');
 
 fwrite(fids.mcor_orig,mcor_orig,'real*4');
 fwrite(fids.mcor_res, mcor_res,'real*4');
