@@ -25,9 +25,9 @@ smallx=1:params.rx/2:nx;
 smally=[params.ry*2 params.ry*2+[1:params.ry/2:params.dely params.dely+1]];
 [sy,sx] = meshgrid(smally,smallx);
 cs=linspace(0,1,100);
-cutoffs=linspace(-0.01,0.1,20);
+
 for j=50
-%for j=1:ny
+    %for j=1:ny
     j
     
     cpx          = load_slc_chunk(params,slcnames,1,nx,j-floor(length(windy)/2),j+floor(length(windy)/2)+params.dely,'cpx');
@@ -40,30 +40,24 @@ for j=50
     tphs_resk      = load_slc_chunk(params,filenames.tphs_resk,1,nx,j-floor(length(windy)/2),j+floor(length(windy)/2)+params.dely,'r4');
     
     dres = tphs_resk-tphs_orig;
-     [~,ints,cors]         = make_cor(cpx,intid,wind,windn,wind3,windn3,params);
-     h1 = hist(cors(:),cs);
- %figure
- %plot(cs,h1)
- %hold on
- 
+    [~,ints,cors]         = make_cor(cpx,intid,wind,windn,wind3,windn3,params);
+
+    tmp=repmat(dres,nd,1,1);
+    
     disp('done loading')
     means          = atan(mk);
     
-    for i=1:length(cutoffs)
-    correction     = exp(1j*mk.*slopes).*conj(exp(1j*means));
-    correction(repmat(dres,211,1,1)<cutoffs(i))=1;
+    correction     = exp(1j*mk.*slopes);
+    correction(tmp<-0.01)=1;
     
-    newhp          = cpx.*conj(correction); 
-     
+    newhp          = cpx.*conj(correction);
+    
     [~,ints_new,cors_new] = make_cor(newhp,intid,wind,windn,wind3,windn3,params);
     disp('done making cor')
+    
 
-     h3 = hist(cors_new(:),cs);
- %    plot(cs,h3)
-%     pause(0.01)
-     allh3(i,:)=h3;
-    end
 end
+
 
 save allh3 allh3
 
