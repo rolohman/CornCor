@@ -18,7 +18,7 @@ end
 
 
 amps   = cpx.*conj(cpx);
-ampsum = sqrt(convn(amps,wind3,'same')./windn3);
+ampsum = convn(amps,wind3,'same')./windn3;
 
 for i=1:ni
     slc1 = squeeze(cpx(intid(i,1),:,:));
@@ -28,7 +28,7 @@ for i=1:ni
     asum = squeeze(ampsum(intid(i,1),:,:));
     bsum = squeeze(ampsum(intid(i,2),:,:));
     csum = conv2(c,wind,'same')./windn;
-    cpx3 = csum./asum./bsum;
+    cpx3 = csum./sqrt(asum.*bsum);
     cpx3(isnan(cpx3)) = 0;
     
     gamma(i,:,:)=cpx3;

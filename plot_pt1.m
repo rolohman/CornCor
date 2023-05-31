@@ -17,9 +17,9 @@ params.dt1                        = length(dates);
 [Gi0,~]                           = make_G(ni,nd,id1,id2);
 filenames                         = make_filenames(params,dates,nd);
 
-% load baselines.txt
-% bpr     = baselines(id1)-baselines(id2);
-% abpr    = abs(bpr);
+load baselines.txt
+bpr     = baselines(id1)-baselines(id2);
+abpr    = abs(bpr);
 % bigbase = abpr'>params.minbase;
 
 [windx,windy,wind,~,wind3] = make_kernel(params);
@@ -41,6 +41,11 @@ disp('done loading')
 
 [~,~,cors,hp] = make_cor(cpx,intid,wind,windn,wind3,windn3,params);
 disp('done making cor')
+
+
+output.cpx=cpx;
+clear cpx
+
 
 cors   = squeeze(cors(:,x0,y0));
 hp     = squeeze(hp(:,x0,y0));
@@ -77,7 +82,8 @@ synthcorperm = c0.*exp(Gi0*log(cp0)');
 synthcor = log(1./sqrt(diffmk'.^2+1))+log(c0)+Gi0*log(cp0)';
 
 res      = log(cors)-synthcor;
-good     = res<0.2 & synthcor>log(mincor) & cors>log(mincor);
+%good     = res<0.2 & synthcor>log(mincor) & cors>log(mincor);
+good=isfinite(cors);
 synthcor = exp(synthcor);
 synthhp  = exp(1j*hp0(intid(:,2))).*conj(exp(1j*hp0(intid(:,1))));
 reshp0=angle(exp(1j*(hp0-allmk*slope+atan(allmk))));

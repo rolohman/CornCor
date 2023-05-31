@@ -17,9 +17,10 @@ params.dt1                        = length(dates);
 [Gi0,~]                           = make_G(ni,nd,id1,id2);
 filenames                         = make_filenames(params,dates,nd);
 
-% load baselines.txt
-% bpr     = baselines(id1)-baselines(id2);
-% abpr    = abs(bpr);
+dt2=diff(dn(intid),[],2); %delta time in days
+load baselines.txt
+bpr     = baselines(id1)-baselines(id2);
+abpr    = abs(bpr);
 % bigbase = abpr'>params.minbase;
 
 [windx,windy,wind,~,wind3] = make_kernel(params);
@@ -30,6 +31,8 @@ x0 = xpt-x1+1;
 y0 = ypt-y1+1;
 
 cpx    = load_slc_chunk(params,slcnames,x1,x2,y1,y2,'cpx');
+
+
 
 windn         = conv2(ones(size(cpx,2),size(cpx,3)),wind,'same');
 windn3(1,:,:) = windn;
@@ -42,33 +45,54 @@ disp('done loading')
 [~,~,cors,hp] = make_cor(cpx,intid,wind,windn,wind3,windn3,params);
 disp('done making cor')
 
+output.cpx=cpx;
+output.abp=abpr;
+output.intid=intid;
+output.dn=dn;
+
+clear cpx
+
 cors   = squeeze(cors(:,x0,y0));
 hp     = squeeze(hp(:,x0,y0));
 
+ph     = transpose(invert_phsmat(hp,nd,intid));
 
 diags=dt==1;
 first=intid(:,1)==1;
+
+rm=mean(ph(2:end).*conj(hp(first))); % just rotates ph relative to hp for plotting
+ph=ph.*conj(rm);
+
+
 %mags          = squeeze(ampsum(:,x0,y0));
 mags=squeeze(ampsum);
 diffmag       = mags(intid(:,2))-mags(intid(:,1));
 
-figure('position',[1500 70 1276 911])
+figure('position',[38   231   648   617],'name',[num2str(xpt) ' ' num2str(ypt)])
 subplot(2,2,1)
 triplot(angle(hp),dn,intid)
 caxis([-pi pi])
-title('hp')
+title('hp \phi')
+datetick('x'),datetick('y'),axis tight
 
 subplot(2,2,2)
 triplot(cors,dn,intid)
 caxis([0 1])
 c2=caxis;
-title('cor')
+title('|\gamma|')
+datetick('x'),datetick('y'),axis tight
 
+subplot(4,1,3)
+scatter(dt2,cors,10,angle(hp),'filled'),grid on
+xlabel('days')
+ylabel('|\gamma|')
+title('color=hp \phi')
 
-subplot(2,2,3)
-scatter(dt,cors,10,angle(hp),'filled'),grid on
-
-
-subplot(2,2,4)
+subplot(4,1,4)
 scatter(dn(2:end),angle(hp(first)),30,cors(first),'filled'),axis([min(dn) max(dn) -pi pi]),grid on
-a=1;
+hold on
+plot(dn,angle(ph),'k.')
+datetick
+title('hp\phi vs. first date, color=|\gamma|')
+ylabel('hp \phi')
+axis tight
