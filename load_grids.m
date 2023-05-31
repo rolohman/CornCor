@@ -49,6 +49,15 @@ slope=squeeze(slope);
 mk=squeeze(mk);
 dres=tphs_resk-tphs_orig;
 
+var0=-2*log(tphs_orig);
+var1=-2*log(tphs_resk);
+R=1-var1./var0;
+%hist(R(:),100)
+
+
+
+
+return
 figure
 subplot(2,2,1)
 scatter(mcor_orig(:),mcor_res(:),5,c0(:),'filled')

@@ -10,7 +10,7 @@ use     = or(dday<=maxdt,intid(:,1)<=dt1);
 intid1  = intid(use,:);
 intid2  = intid(~use,:);
 if(size(intid2,1)>1)
-    p       = randperm(size(intid2,1),min(size(intid2,1),2000));
+    p       = randperm(size(intid2,1),min(size(intid2,1),4000));
     intid   = [intid1;intid2(p,:)];
 else
     intid=intid1;

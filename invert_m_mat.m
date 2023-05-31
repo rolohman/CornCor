@@ -1,19 +1,19 @@
-function [c0,cp,mk,synth,res] = invert_m_mat(logcor,nd,Gi0,intid)
+function [c0,cp,mk,synth,res] = invert_m_mat(logcor,stds,nd,Gi0,intid)
 %expects log cor
 d  = logcor;
 mincor = 0.45;
 
-tmpd          = d;
-tmpd(tmpd>0)  = 0;
-tmpd(tmpd<-1) = -1;
-sigs          = sqrt(-2*tmpd);
-wgts          = 1./sigs.^2;
+wgts=1./stds.^2;
+wgts(~isfinite(wgts))=0;
+
+d(d>0)  = 0;
+%tmpd(tmpd<-1) = -1;
 dt            = intid(:,2)-intid(:,1);
 diags         = dt==1;
 
-[c0,cp,~,synth1]=est_cp(d,wgts,Gi0,diags,mincor);
+[c0,cp,~,synth1]=est_cp(d,Gi0,diags,mincor);
 d        = d-synth1;
-d(d>0.2) = NaN; %correction clearly bad
+%d(d>0.2) = NaN; %correction clearly bad
 good     = isfinite(d);
 
 id1  = sub2ind([nd,nd],intid(good,1),intid(good,2));
@@ -41,8 +41,8 @@ synth2 = log(1./sqrt((1+crs2.^2)));
 %d     = logcor-synth2;
 %c0=median(d);
 synth = synth1+synth2;
-synth(~good)=NaN;
+%synth(~good)=NaN;
 res   = logcor-synth;
-bad   = res>0.2;
-res(bad)=NaN;
-synth(bad)=NaN;
+%bad   = res>0.2;
+%res(bad)=NaN;
+%synth(bad)=NaN;

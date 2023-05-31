@@ -11,6 +11,7 @@ fids                              = open_files(filenames,'w');
 n=params.rx*params.ry;
 shortid=find(dt==1);
 
+dt2=dn(intid(:,2))-dn(intid(:,1));
 load baselines.txt
 bpr     = baselines(id1)-baselines(id2);
 abpr    = abs(bpr);
@@ -33,51 +34,71 @@ for j=1:params.dely:ny
     disp('done making cor')
     
     %invert cor on coarse grid
-    for k=1:length(smally)
-        
+    for k=1:length(smally)        
         for i=1:length(smallx)
             data  = squeeze(cors(:,smallx(i),smally(k)))';
             d     = log(data);
-            stds  = sqrt(-2*d);
+            stds  = sqrt(-2*d');
             
-            [c00,cp0,mk0,synth0] = invert_m_mat(d',nd,Gi0,intid);
+            ds=[1:12:100 logspace(log10(110),log10(max(dt2)),25)];
+            bins=ds(1:end-1)+diff(ds)/2;
+            for l=1:length(bins)
+                id=dt2>=ds(l) & dt2<ds(l+1);
+                maxt(l)=mymax(d(id),100);
+                nbin(l)=sum(id);
+            end
+            Gbin=[ones(length(bins),1) sqrt(bins)' ];
+            Ginv=inv(Gbin'*Gbin)*Gbin';
+            mod=Ginv*maxt';
+            c00=mod(1);
+            pf=mod(2);
+           
+            synth00=c00+pf*sqrt(dt2);
+            d2=d-synth00';
+            
+            [c0,cp0,mk0,synth0] = invert_m_mat(d2',stds,nd,Gi0,intid);
             mk0(mk0==0)=NaN;
             mk0 = mk0+mymax(-mk0,3);
             mk0(mk0<0)=0;         
             mk0(isnan(mk0))      = 0;
            
-            d2                   = d'-c00-Gi0*cp0;
-            d2(isnan(synth0))    = NaN;
+           % d2                   = d'-c00-Gi0*cp0;
+            %d2(isnan(synth0))    = NaN;
             
-            good    = isfinite(d2);
-            start   = [mk0];
-            LB      = [zeros(nd,1)];
-            UB      = [inf(nd,1)];
-            mk1     = lsqnonlin('corfit',start,LB,UB,params.OPTIONS,d2(good),stds(good)',Gr0(good,:),1);
+            good    = isfinite(synth0);
+            start   = [c0;d(diags)'-c0;mk0];
+            start=start(2:end);
+            LB      = [-inf(nd-1,1);zeros(nd,1)];
+            UB      = [zeros(nd-1,1);inf(nd,1)];
+            %start   = [mk0];
+            %            LB      = [zeros(nd,1)];
+            %            UB      = [inf(nd,1)];
+            mod     = lsqnonlin('corfit_all',start,LB,UB,params.OPTIONS,d2(good),stds(good),Gi0(good,:),Gr0(good,:),1);
+            [res1,synth]= corfit_all(mod,d2,stds,Gi0,Gr0,1);
             
-            mk1         = mk1+ mymax(-mk1,3);
-            mk1(mk1<0)  = 0;
-                
-            d2 = d-c00-Gi0*cp0;
-            [~,synth] = corfit(mk1,d2,stds',Gr0,1);
-            synth = synth+c00+Gi0*cp0;
-            res   = d'-synth;
-            good  = good & res<0.2 & synth>log(mincor) & d'>log(mincor);
+            c0=c00+c0;
+            cp=mod(1:nd-1);
+            mk1=mod(nd:end);
+            mk1         = mk1+ mymax(-mk1,5);
+            mk1(mk1<0)  = -mk1(mk1<0);
+           
+            res   = d2'-synth;
+            %good  = good & res<0.2 & synth>log(mincor) & d'>log(mincor);
             
             small_mcor_orig(i,k) = sqrt(mean(d(good).^2,'omitnan'));
             small_mcor_res(i,k)  = sqrt(mean(res(good).^2,'omitnan'));
             
-            smallc0(i,k)=c00;
-            smallcp(i,k,:)=cp0;
+            smallc0(i,k)=c0;
+            smallcp(i,k,:)=cp;
             smallmk1(i,k,:)=mk1;
+            smallpf(i,k,:)=pf;
         end
     end
     
     for k=params.ry*2+[1:params.dely]
         
         for i=1:nx
-            data  = squeeze(cors(:,i,k))';
-            d     = log(data);
+            i
             
             GINT        = griddedInterpolant(sx,sy,squeeze(smallmk1(:,:,1)));
             for l=1:nd
@@ -94,21 +115,15 @@ for j=1:params.dely:ny
             mcor_orig(i)=GINT(i,k);
             GINT.Values = small_mcor_res;
             mcor_res(i)=GINT(i,k);
+            GINT.Values = smallpf;
+            pf(i)=GINT(i,k);
+            
             allmk1(i,:)=mk1;
             meank1       = atan(mk1);
             
             
             
-            
-            cdiag = d(diags)-c0(i);
-            
-            %pull out all intervals with diag coherence of mincor or lower
-            permbad=cdiag<log(mincor);
-            
-            %which ints are bad?
-            tmp = Gi0*permbad';
-            good = or(tmp==0 & d'>log(mincor),dt==1); %keep the ones on the diagonal for reference
-            
+ 
             %             synth = c0+Gi0*cp0;
             %             res   = d'-synth;
             %             good  = good & res<0.2 & synth>log(mincor) & d'>log(mincor);
@@ -167,7 +182,7 @@ for j=1:params.dely:ny
             
             
         end
-        write_output(fids,mcor_orig,mcor_res,c0,allmk1,cp,slopesk1,tphs_orig,tphs_res,tphs_resk,allhp,alllp);
+        write_output(fids,mcor_orig,mcor_res,c0,pf,allmk1,cp,slopesk1,tphs_orig,tphs_res,tphs_resk,allhp,alllp);
     end
 end
 

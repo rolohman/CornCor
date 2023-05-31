@@ -4,6 +4,7 @@ nd=length(filenames.hp);
 ks=length(filenames.slope);
 
 fids.c0        = fopen(filenames.c0,rw);
+fids.pf        = fopen(filenames.pf,rw);
 fids.mcor_orig = fopen(filenames.mcor_orig,rw);
 fids.mcor_res  = fopen(filenames.mcor_res,rw);
 

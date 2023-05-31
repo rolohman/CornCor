@@ -22,7 +22,7 @@ params.minbase = 50; %only use baselines > this amount
 
 params.dely    = 10; %number of lines to process in each batch
 params.k       = [1];
-params.maxdt   = 120; %maximum time interval to use in calcs (days)
+params.maxdt   = 45; %maximum time interval to use in calcs (days)
 params.dt1     = 2;  %always make pairs starting with dates <= this date
 
 
