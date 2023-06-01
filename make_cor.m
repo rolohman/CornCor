@@ -1,4 +1,4 @@
-function [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params)
+ function [gamma,ints,cors,hp]=make_cor(cpx,intid,wind,windn,wind3,windn3,params)
 
 
 ni     = size(intid,1);

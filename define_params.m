@@ -1,7 +1,7 @@
 %params.slcdir='cropped_15420_1396_1600_320/SLC_vv/';
 %params.slcdir='cropped_41000_11942_375_200/SLC_VV/';
 params.slcdir='cropped_16162_1646_200_100/SLC_vv/';
-params.outdir=[params.slcdir 'trial1/'];
+params.outdir=[params.slcdir 'trial2/'];
 
 %params.nx     = 1600;
 %params.ny     = 320;

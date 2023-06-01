@@ -1,19 +1,33 @@
-function [c0,cp,permbad,synth]=est_cp(d,Gi0,diags,mincor)
+function [c0,cp,permbad,synth]=est_cp(d,Gi0,diags,mincor,perc)
 [~,nint]=size(Gi0);
 OPTIONS = optimset('Display','none');
+dn=1:nint+1;
+intid=nchoosek(dn,2);
 
 c0    = max(d);
 %cdiag = d(diags)-c0;
-cdiag=d(diags);
+cdiag=d(diags)-c0;
 
-[~,sortid]=sort(cdiag);
+res=d-c0;
+for i=1:nint
+    a=find(Gi0(:,i));
+    cp0(i)=min(0,mymax(res(a),10));
+end
+
+
+[~,sortid]=sort(cp0);
 cp=0*cdiag;
 
-res=d;
+figure
+triplot(res,dn,intid),colorbar
 for i=1:nint
     a=find(Gi0(:,sortid(i)));
     cp(sortid(i))=min(0,mymax(res(a),10));
-    res=res-Gi0(:,sortid(i))*cp(sortid(i));
+    cpp=Gi0(:,sortid(i))*cp(sortid(i));
+    scaleperc = log(perc+exp(cpp)*(1-perc));
+    res=res-scaleperc;
+    triplot(res,dn,intid),colorbar
+    pause
 end
 %pull out all intervals with diag coherence of mincor or lower
 permbad=cdiag<log(mincor);
